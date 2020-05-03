@@ -4,8 +4,10 @@ pipeline {
    agent any
 
    environment {
-       giturl = 'https://github.com/intermine/biotestmine'
+       giturl = 'https://github.com/serhii1998/biotestmine.git'
        GRADLE_OPTS="-Xmx1024m -Dorg.gradle.daemon=false"
+       PSQL_USER = "user1"
+       PSQL_PWD = "root"
        bucket = "husakbucket2"
   }
 
@@ -17,9 +19,8 @@ pipeline {
       }
       stage('build war') {
          steps {
-             sh 'cp ./data/project.xml .'
-             
-             sh './gradlew war'
+             sh 'cp ~/.intermine/project.xml .'
+             sh './gradlew war --info'
          }
       }
       stage('Upload') {
@@ -39,6 +40,5 @@ pipeline {
                 color: COLOR_MAP[currentBuild.currentResult],
                 message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}"
         }
-
     }
 }
