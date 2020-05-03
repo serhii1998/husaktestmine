@@ -1,0 +1,44 @@
+def COLOR_MAP = ['SUCCESS': 'good', 'FAILURE': 'danger', 'UNSTABLE': 'danger', 'ABORTED': 'danger']
+
+pipeline {
+   agent any
+
+   environment {
+       giturl = 'https://github.com/intermine/biotestmine'
+       GRADLE_OPTS="-Xmx1024m -Dorg.gradle.daemon=false"
+       bucket = "husakbucket2"
+  }
+
+   stages {
+      stage('Clonning from GitHub') {
+         steps {
+            git url: giturl
+         }
+      }
+      stage('build war') {
+         steps {
+             sh 'cp ./data/project.xml .'
+             
+             sh './gradlew war'
+         }
+      }
+      stage('Upload') {
+          steps {
+              withAWS(region:'us-east-1', credentials:'aws-creds'){
+                s3Upload(bucket: bucket , path:"intermine-v1.0.${env.BUILD_NUMBER}",
+                includePathPattern:'**/*.war' , workingDir:'webapp/build/libs')
+            }
+          }
+       }
+    }
+   post {
+        always {
+            cleanWs()
+            
+            slackSend channel: '#appdeployment',
+                color: COLOR_MAP[currentBuild.currentResult],
+                message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}"
+        }
+
+    }
+}
