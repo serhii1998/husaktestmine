@@ -48,8 +48,8 @@ subprojects {
         description "Copies mine specific intermine.properties file (from .intermine directory) into resources output to be included in the war"
         dependsOn 'processResources'
 
-        //def db_username = System.getenv('USER')
-        //def db_pw = System.getenv('USER')
+        def db_username = System.getenv('USER')
+        def db_pw = System.getenv('USER')
 
         // use ENV VARs instead if they've set them. need for travis
         if (System.getenv('PSQL_USER')) {
