@@ -59,7 +59,7 @@ subprojects {
             db_pw = System.getenv('PSQL_PWD')
         }
 
-       // from (minePropertyFile) {
+        from (minePropertyFile) //{
        //     filter{String line -> line.replaceAll('PSQL_USER', db_username)}
       //      filter{String line -> line.replaceAll('PSQL_PWD', db_pw)}
        // }
