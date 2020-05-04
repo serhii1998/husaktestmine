@@ -6,8 +6,6 @@ pipeline {
    environment {
        giturl = 'https://github.com/serhii1998/biotestmine.git'
        GRADLE_OPTS="-Xmx1024m -Dorg.gradle.daemon=false"
-       PSQL_USER = "user1"
-       PSQL_PWD = "root"
        bucket = "husakbucket2"
   }
 
@@ -20,7 +18,8 @@ pipeline {
       stage('build war') {
          steps {
              sh 'cp ~/.intermine/project.xml .'
-             sh './gradlew war --info'
+             sh './gradlew war '
+             sh 'ls -la webapp/build/libs'
          }
       }
       stage('Upload') {
