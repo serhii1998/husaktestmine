@@ -16,12 +16,9 @@ buildscript {
 
 ext {
     mineRelease = hasProperty('release') ? "." + release : ''
-    mineName = "biotestmine"
+    mineName = "husaktestmine"
     minePropertyFileName = "${mineName}.properties$mineRelease"
     minePropertyFile = "${System.env.HOME}/.intermine/$minePropertyFileName"
-    if( !file(minePropertyFile).exists() ) {
-        minePropertyFile = "$project.rootDir/dbmodel/resources/biotestmine.properties"
-    }
     println "Using properties file: '$minePropertyFile'"
 }
 
