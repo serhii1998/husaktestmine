@@ -13,7 +13,7 @@ pipeline {
    stages {
       stage('Clonning from GitHub') {
          steps {
-            git url: giturl
+            git credentialsId: 'git-creds', url: giturl
          }
       }
       stage('build') {
