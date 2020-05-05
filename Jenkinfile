@@ -2,7 +2,21 @@ def COLOR_MAP = ['SUCCESS': 'good', 'FAILURE': 'danger', 'UNSTABLE': 'danger', '
 
 pipeline {
    agent any
-
+   
+   triggers {
+    GenericTrigger(
+     genericVariables: [
+      [key: 'ref', value: '$.ref']
+     ],
+     causeString: 'Triggered on $ref',
+     token: 'a64ab7898537033b10d4c03839f5531e13e500c6',
+     printContributedVariables: true,
+     printPostContent: true,
+     silentResponse: false,
+     regexpFilterText: '$ref',
+     regexpFilterExpression: "refs/heads/dev" 
+    )
+   }
    environment {
        giturl = 'https://github.com/serhii1998/husaktestmine.git'
        GRADLE_OPTS="-Xmx1024m -Dorg.gradle.daemon=false"
@@ -13,7 +27,7 @@ pipeline {
    stages {
       stage('Clonning from GitHub') {
          steps {
-            git credentialsId: 'git-creds', url: giturl
+            git branch: 'master', credentialsId: 'git-creds', url: giturl
          }
       }
       stage('build') {
