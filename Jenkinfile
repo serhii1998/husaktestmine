@@ -18,6 +18,7 @@ pipeline {
       stage('build war') {
          steps {
              sh 'cp ~/.intermine/project.xml .'
+             sh './gradlew clean '
              sh './gradlew war '
              sh 'ls -la webapp/build/libs'
          }
@@ -25,6 +26,8 @@ pipeline {
       stage('Upload') {
           steps {
               withAWS(region:'us-east-1', credentials:'aws-creds'){
+                s3Upload(bucket: bucket , path:"intermine-latest",
+                includePathPattern:'**/*.war' , workingDir:'webapp/build/libs')
                 s3Upload(bucket: bucket , path:"intermine-v1.0.${env.BUILD_NUMBER}",
                 includePathPattern:'**/*.war' , workingDir:'webapp/build/libs')
             }
