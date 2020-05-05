@@ -4,9 +4,10 @@ pipeline {
    agent any
 
    environment {
-       giturl = 'https://github.com/serhii1998/biotestmine.git'
+       giturl = 'https://github.com/serhii1998/husaktestmine.git'
        GRADLE_OPTS="-Xmx1024m -Dorg.gradle.daemon=false"
        bucket = "husakbucket2"
+       ip = sh (script: """aws ec2 describe-instances  --filters "Name=tag:Name,Values=dev-web" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' --output text --region 'us-east-2'""", returnStdout: true).trim()
   }
 
    stages {
@@ -15,15 +16,25 @@ pipeline {
             git url: giturl
          }
       }
-      stage('build war') {
+      stage('build') {
          steps {
              sh 'cp ~/.intermine/project.xml .'
              sh './gradlew clean '
+             sh './gradlew build '
+         }
+      }
+      stage('test') {
+         steps {
+             sh './gradlew test '
+         }
+      }
+      stage('create war') {
+         steps {
              sh './gradlew war '
              sh 'ls -la webapp/build/libs'
          }
       }
-      stage('Upload') {
+      stage('Upload to s3') {
           steps {
               withAWS(region:'us-east-1', credentials:'aws-creds'){
                 s3Upload(bucket: bucket , path:"intermine-latest",
@@ -33,11 +44,22 @@ pipeline {
             }
           }
        }
+      stage('deploy war to tomcat') {
+          environment {
+                address = sh (script:'echo "http://${ip}:8080"', returnStdout: true).trim()
+            }
+          steps {
+             sh 'echo "http://${ip}:8080"'
+             sh 'pwd '
+             deploy adapters: [tomcat8(credentialsId: 'tomcat-creds', path: '', url: address)], contextPath: '/mytestmine', onFailure: false, war: 'webapp/build/libs/*.war'
+         }
+      }
+      
+      
     }
    post {
         always {
-            cleanWs()
-            
+            junit allowEmptyResults: true, testResults:'**/reports/junit/*.xml'
             slackSend channel: '#appdeployment',
                 color: COLOR_MAP[currentBuild.currentResult],
                 message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}"
