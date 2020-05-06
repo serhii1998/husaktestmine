@@ -33,6 +33,11 @@ pipeline {
       stage('build') {
          steps {
              sh 'cp ~/.intermine/project.xml .'
+             script {
+                 if (env.BUILD_ID == '1') {
+                     sh './gradlew buildUserDB'
+                 } 
+             } 
              sh './gradlew clean '
              sh './gradlew build '
          }
