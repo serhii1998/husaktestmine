@@ -56,9 +56,9 @@ pipeline {
       stage('Upload to s3') {
           steps {
               withAWS(region:'us-east-1', credentials:'aws-creds'){
-                s3Upload(bucket: bucket , path:"intermine-latest",
+                s3Upload(bucket: bucket , path:"dev/intermine-latest",
                 includePathPattern:'**/*.war' , workingDir:'webapp/build/libs')
-                s3Upload(bucket: bucket , path:"intermine-v1.0.${env.BUILD_NUMBER}",
+                s3Upload(bucket: bucket , path:"dev/intermine-v1.0.${env.BUILD_NUMBER}",
                 includePathPattern:'**/*.war' , workingDir:'webapp/build/libs')
             }
           }
