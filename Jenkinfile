@@ -9,7 +9,7 @@ pipeline {
       [key: 'ref', value: '$.ref']
      ],
      causeString: 'Triggered on $ref',
-     token: 'a64ab7898537033b10d4c03839f5531e13e500c6',
+     token: '10821c29df5c8801ec58be2c9386c9a9166376b2',
      printContributedVariables: true,
      printPostContent: true,
      silentResponse: false,
