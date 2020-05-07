@@ -21,7 +21,7 @@ pipeline {
        giturl = 'https://github.com/serhii1998/husaktestmine.git'
        GRADLE_OPTS="-Xmx1024m -Dorg.gradle.daemon=false"
        bucket = "husakbucket2"
-       ip = sh (script: """aws ec2 describe-instances  --filters "Name=tag:Name,Values=dev-web" "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' --output text --region 'us-east-2'""", returnStdout: true).trim()
+       ip = sh (script: """aws ec2 describe-instances  --filters "Name=tag:Name,Values=prod-web" "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' --output text --region 'us-east-2'""", returnStdout: true).trim()
   }
 
    stages {
@@ -56,14 +56,14 @@ pipeline {
       stage('Upload to s3') {
           steps {
               withAWS(region:'us-east-1', credentials:'aws-creds'){
-                s3Upload(bucket: bucket , path:"intermine-latest",
+                s3Upload(bucket: bucket , path:"prod/intermine-latest",
                 includePathPattern:'**/*.war' , workingDir:'webapp/build/libs')
-                s3Upload(bucket: bucket , path:"intermine-v1.0.${env.BUILD_NUMBER}",
+                s3Upload(bucket: bucket , path:"prod/intermine-v1.0.${env.BUILD_NUMBER}",
                 includePathPattern:'**/*.war' , workingDir:'webapp/build/libs')
             }
           }
        }
-      stage('approve deplod') {
+      stage('approve deploy') {
          steps {
             input "Deploy to prod?"
          }
@@ -78,8 +78,6 @@ pipeline {
              deploy adapters: [tomcat8(credentialsId: 'tomcat-creds', path: '', url: address)], contextPath: '/husaktestmine', onFailure: false, war: 'webapp/build/libs/*.war'
          }
       }
-      
-      
     }
    post {
         always {
