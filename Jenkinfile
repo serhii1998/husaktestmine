@@ -21,13 +21,13 @@ pipeline {
        giturl = 'https://github.com/serhii1998/husaktestmine.git'
        GRADLE_OPTS="-Xmx1024m -Dorg.gradle.daemon=false"
        bucket = "husakbucket2"
-       ip = sh (script: """aws ec2 describe-instances  --filters "Name=tag:Name,Values=dev-web" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' --output text --region 'us-east-2'""", returnStdout: true).trim()
+       ip = sh (script: """aws ec2 describe-instances  --filters "Name=tag:Name,Values=dev-web" "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' --output text --region 'us-east-2'""", returnStdout: true).trim()
   }
 
    stages {
       stage('Clonning from GitHub') {
          steps {
-            git branch: 'master', credentialsId: 'git-creds', url: giturl
+            git branch: 'dev', credentialsId: 'git-creds', url: giturl
          }
       }
       stage('build') {
