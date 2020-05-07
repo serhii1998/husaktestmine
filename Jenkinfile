@@ -14,7 +14,7 @@ pipeline {
      printPostContent: true,
      silentResponse: false,
      regexpFilterText: '$ref',
-     regexpFilterExpression: "refs/heads/dev" 
+     regexpFilterExpression: "refs/heads/master" 
     )
    }
    environment {
@@ -27,7 +27,7 @@ pipeline {
    stages {
       stage('Clonning from GitHub') {
          steps {
-            git branch: 'dev', credentialsId: 'git-creds', url: giturl
+            git branch: 'master', credentialsId: 'git-creds', url: giturl
          }
       }
       stage('build') {
